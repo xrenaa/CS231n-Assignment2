@@ -47,7 +47,7 @@ def sgd(w, dw, config=None):
 def sgd_momentum(w, dw, config=None):
     """
     Performs stochastic gradient descent with momentum.
-
+    
     config format:
     - learning_rate: Scalar learning rate.
     - momentum: Scalar between 0 and 1 giving the momentum value.
@@ -65,7 +65,9 @@ def sgd_momentum(w, dw, config=None):
     # TODO: Implement the momentum update formula. Store the updated value in #
     # the next_w variable. You should also use and update the velocity v.     #
     ###########################################################################
-    pass
+    #using Nesterov Momentum
+    v = v*config['momentum'] - config['learning_rate']*dw
+    next_w = w +  v
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
@@ -99,7 +101,9 @@ def rmsprop(x, dx, config=None):
     # in the next_x variable. Don't forget to update cache value stored in    #
     # config['cache'].                                                        #
     ###########################################################################
-    pass
+    cache = config['decay_rate']*config['cache']+(1-config['decay_rate'])*dx*dx
+    next_x =x-config['learning_rate']*dx / (np.sqrt(cache)+1e-7)
+    config['cache']= cache
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
@@ -136,7 +140,14 @@ def adam(x, dx, config=None):
     # the next_x variable. Don't forget to update the m, v, and t variables   #
     # stored in config.                                                       #
     ###########################################################################
-    pass
+    m=config['m']*config['beta1']+(1-config['beta1'])*dx
+    v=config['v']*config['beta2']+(1-config['beta2'])*dx*dx
+    first_unbias = m / (1-config['beta1']**config['t'])
+    second_unbias = v / (1-config['beta2']**config['t'])
+    next_x = x - config['learning_rate'] *first_unbias /(np.sqrt(second_unbias)+config['epsilon'])
+    config['t']+=1
+    config['m'] = m
+    config['v'] = v
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
